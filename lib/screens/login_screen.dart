@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:login_register/model/person.dart';
 import 'package:login_register/screens/register.dart';
+import 'package:login_register/util/db_handler.dart';
 
 
 class LoginScreen extends StatefulWidget {
@@ -10,6 +12,10 @@ class LoginScreen extends StatefulWidget {
 }
 
 class LoginScreenState extends State<LoginScreen> {
+final TextEditingController _txtname = TextEditingController();
+// it monitors changes made within
+final TextEditingController _txtpassword = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,15 +36,17 @@ class LoginScreenState extends State<LoginScreen> {
             color: Colors.white,
             //color codes are fine too.
             ),
-            const TextField(
-              decoration: InputDecoration(
+             TextField(
+              controller: _txtname,
+              decoration: const InputDecoration(
                 labelText: "Username/Account ID",
                 hintText: "Enter Your Username/Account ID",
               ),
             ),
             
-            const TextField(
-              decoration: InputDecoration(
+             TextField(
+              controller:_txtpassword,
+              decoration: const InputDecoration(
                 labelText: "Password",
                 hintText: "Enter Your Password",
                 hoverColor: Colors.lightBlue,
@@ -47,8 +55,22 @@ class LoginScreenState extends State<LoginScreen> {
               ),
             ),
             TextButton(
-              onPressed: () { 
-                Navigator.push(context, MaterialPageRoute(builder: ((context) => const RegisterScreen())));
+              onPressed: () async{ 
+               // Navigator.push(context, MaterialPageRoute(builder: ((context) => const RegisterScreen())));
+               Person person = Person(name:_txtname.text, password: _txtpassword.text);
+               Dbhandler db = Dbhandler();
+               int result = await db.register(person);
+               if (result >= 1 ) { 
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text("Successfully registered"),
+    ));
+               } else{
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text("failed"),
+    ));
+               }
+
+
               },
               //be careful with brackets.
               // revisit navigation. 
